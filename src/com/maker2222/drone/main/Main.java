@@ -3,10 +3,8 @@ package com.maker2222.drone.main;
 
 import java.io.IOException;
 
-import com.maker2222.drone.commandline.Cmd;
 import com.maker2222.drone.droneinterface.SerialCom;
 
-import jssc.SerialPort;
 import jssc.SerialPortException;
 
 
