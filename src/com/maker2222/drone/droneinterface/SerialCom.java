@@ -19,6 +19,7 @@ public class SerialCom implements SerialPortEventListener{
 			return true;
 		}
 		catch(Exception e){
+			System.out.println("Check if Arduino is connected.");
 			e.printStackTrace();
 			return false;
 		}
