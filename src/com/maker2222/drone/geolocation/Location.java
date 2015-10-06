@@ -23,17 +23,17 @@ public class Location {
 		return this.altitude;
 	}
   
-    public void sumLat(double la){
+    public Location sumLat(double la){
         this.latitude = this.latitude + la;
         return this;
     }
     
-    public void sumLon(double lo){
+    public Location sumLon(double lo){
         this.longitude = this.longitude + lo;
         return this;
     }
     
-    public void sumAlt(double al){
+    public Location sumAlt(double al){
         this.altitude = this.altitude + al;
         return this;
     }

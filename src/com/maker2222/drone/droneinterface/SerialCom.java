@@ -40,7 +40,7 @@ public class SerialCom implements SerialPortEventListener{
 			s = new String(e, "US-ASCII");
 		} catch (Exception e) {
 			e.printStackTrace();
-		}e
+		}
 		return s;
 	}
 	
@@ -52,7 +52,7 @@ public class SerialCom implements SerialPortEventListener{
 		}
 	}
 	
-	public static string recieve(String s){
+	public static String recieve(String s){
 		send(s);
 		return read();
 	}
