@@ -4,6 +4,11 @@ import geo.google.datamodel.GeoCoordinate;
 
 
 public class LocationHandler {
-	//public static GeoAddressStandardizer standarizer = new GeoAddressStandardizer(hola);
-	public static GeoCoordinate coord = new GeoCoordinate();
+	public static void getLocation(){
+
+		double lat = SerialCom.recieve("getX");
+		double lon = SerialCom.recieve("getY");
+		Location pos = new Location();
+	}
+	
 }

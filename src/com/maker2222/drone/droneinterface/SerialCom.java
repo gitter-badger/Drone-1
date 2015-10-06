@@ -33,14 +33,14 @@ public class SerialCom implements SerialPortEventListener{
 		}
 	}
 	
-	private String read(){
+	public static String read(){
 		String s = "";
 		try {
 			byte[] e = serialPort.readBytes();
 			s = new String(e, "US-ASCII");
 		} catch (Exception e) {
 			e.printStackTrace();
-		}
+		}e
 		return s;
 	}
 	
@@ -50,6 +50,11 @@ public class SerialCom implements SerialPortEventListener{
 		} catch (SerialPortException e) {
 			e.printStackTrace();
 		}
+	}
+	
+	public static string recieve(String s){
+		send(s);
+		return read();
 	}
 }
 

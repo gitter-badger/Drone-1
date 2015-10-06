@@ -22,4 +22,19 @@ public class Location {
 	public double getAlt(){
 		return this.altitude;
 	}
+  
+    public void sumLat(double la){
+        this.latitude = this.latitude + la;
+        return this;
+    }
+    
+    public void sumLon(double lo){
+        this.longitude = this.longitude + lo;
+        return this;
+    }
+    
+    public void sumAlt(double al){
+        this.altitude = this.altitude + al;
+        return this;
+    }
 }
