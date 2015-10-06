@@ -29,6 +29,8 @@ public class JsonRequest extends Thread{
 		}
 	}
 	
+	
+	@Deprecated //This will change to get the forecast from coordinates
 	private static void getJSON(String city) throws IOException{
 		try{
 		String url = "http://api.openweathermap.org/data/2.5/weather?q=" + city + "&lang=sp&units=metric";

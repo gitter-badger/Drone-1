@@ -8,6 +8,7 @@ public class LocationHandler {
 		double lat = Double.valueOf(SerialCom.recieve("getLon"));
 		double lon = Double.valueOf(SerialCom.recieve("getLat"));
 		double alt = Double.valueOf(SerialCom.recieve("getAlt"));
+		@SuppressWarnings("unused")
 		Location pos = new Location(lat, lon, alt);
 	}
 	
