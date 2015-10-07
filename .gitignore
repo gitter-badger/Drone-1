@@ -7,3 +7,4 @@ data.json
 error.log
 key.txt
 /src/test/
+/target/

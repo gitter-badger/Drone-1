@@ -41,11 +41,9 @@ public class JsonRequest extends Thread{
 		out.close();
 		}
 		catch(IOException e){
-			System.out.println("ERROR DE CONEXION");
+			System.out.println("[NETWORK] ERROR DE CONEXION");
 			PrintStream stream = new PrintStream("error.log");
 			e.printStackTrace(stream);
-			json.delete();
-			System.exit(0);
 		}
 	}
 

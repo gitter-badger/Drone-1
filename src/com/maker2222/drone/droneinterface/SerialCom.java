@@ -19,8 +19,8 @@ public class SerialCom implements SerialPortEventListener{
 			return true;
 		}
 		catch(Exception e){
-			System.out.println("Check if Arduino is connected.");
-			e.printStackTrace();
+			System.out.println("[ARDUINO_INTERFACE] Check if Arduino is connected.");
+			//e.printStackTrace();
 			return false;
 		}
 	}
@@ -30,6 +30,7 @@ public class SerialCom implements SerialPortEventListener{
 		if(e.isRXCHAR() == true){
 			System.out.print(read());
 			send("led");
+		    System.out.println("[ARDUINO_INTERFACE] Successfully connected to Arduino");
 		}
 	}
 	
