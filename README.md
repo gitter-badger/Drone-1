@@ -2,4 +2,7 @@
 
 Drone AI development. Based on weather predictions. 
 
-Missing API .jar files.
+Some files are created for debugging:
+- key.txt
+- data.json
+- error.log

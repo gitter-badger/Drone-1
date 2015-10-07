@@ -3,3 +3,8 @@
 /.project
 /.settings/
 /jSSC-2.8.0-Release/
+data.json
+error.log
+key.txt
+/src/test/
+/target/
