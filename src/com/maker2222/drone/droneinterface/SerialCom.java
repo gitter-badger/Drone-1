@@ -25,10 +25,8 @@ public class SerialCom implements SerialPortEventListener{
 		}
 	}
 	
-	@Override
 	public void serialEvent(SerialPortEvent e) {
-		if(e.isRXCHAR() == true){
-			System.out.print(read());
+		if(e.isRXCHAR() == true && read().equals("hola")){
 			send("led");
 		    System.out.println("[ARDUINO_INTERFACE] Successfully connected to Arduino");
 		}
