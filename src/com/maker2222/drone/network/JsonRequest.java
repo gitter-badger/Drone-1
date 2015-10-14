@@ -15,9 +15,12 @@ import org.apache.commons.io.IOUtils;
 import org.json.JSONArray;
 import org.json.JSONObject;
 
+import com.maker2222.drone.main.ReadKey;
+
 public class JsonRequest extends Thread{
 	 public static File json = new File("data.json");
 	 public static Date fecha = new Date ();
+	public static Weather w;
 	 
 	@Override
 	public void run() {
@@ -33,7 +36,7 @@ public class JsonRequest extends Thread{
 	@Deprecated //This will change to get the forecast from coordinates
 	private static void getJSON(String city) throws IOException{
 		try{
-		String url = "http://api.openweathermap.org/data/2.5/weather?q=" + city + "&lang=sp&units=metric";
+		String url = "http://api.openweathermap.org/data/2.5/weather?q=" + city + "&lang=sp&units=metric&APPID=" + ReadKey.key();
 		URL website = new URL(url); //Http request
 		ReadableByteChannel in = Channels.newChannel(website.openStream());
 		FileOutputStream out = new FileOutputStream("data.json");
@@ -53,6 +56,7 @@ public class JsonRequest extends Thread{
 		//System.out.println(jsonTxt);
 		JSONObject obj = new JSONObject(jsonTxt);
 		JSONArray arr = obj.getJSONArray("weather");
+	    JSONObject obj2 = obj.getJSONObject("main");
 		for (int i = 0; i < arr.length(); i++)
 		{
 			System.out.println(obj.getString("name")); //Print location name
@@ -61,8 +65,9 @@ public class JsonRequest extends Thread{
 			System.out.println("	" + fecha); //Print date (converted from UTC)
 		    String main = arr.getJSONObject(i).getString("main"); //Print main prediction
 		    System.out.println("		" + main);
-		    JSONObject obj2 = obj.getJSONObject("main");
 		    System.out.println("		" + obj2.getInt("temp") + " C"); //Print temperature
 		}
+		w = new Weather(arr.getJSONObject(0).getString("main"), obj2.getInt("temp"), obj.getInt("dt"));
+		System.out.println(w.getFc());
 	}
 }
