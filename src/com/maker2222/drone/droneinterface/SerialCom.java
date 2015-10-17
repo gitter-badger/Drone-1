@@ -1,5 +1,7 @@
 package com.maker2222.drone.droneinterface;
 
+import com.maker2222.drone.main.Main;
+
 import jssc.SerialPort;
 import jssc.SerialPortEvent;
 import jssc.SerialPortEventListener;
@@ -15,7 +17,7 @@ public class SerialCom implements SerialPortEventListener{
 		    serialPort.openPort();
 			serialPort.addEventListener(new SerialCom());
 		    serialPort.setParams(115200, 8, 1, 0);
-		    Thread.sleep(1000);
+		    Thread.sleep(1200);
 			return true;
 		}
 		catch(Exception e){
@@ -26,17 +28,31 @@ public class SerialCom implements SerialPortEventListener{
 	}
 	
 	public void serialEvent(SerialPortEvent e) {
-		if(e.isRXCHAR() == true && read().equals("hola")){
-			send("led");
+		if(e.isRXCHAR() == true && connect().equals("hola")){
+			send("ok");
 		    System.out.println("[ARDUINO_INTERFACE] Successfully connected to Arduino");
+		    System.out.println("");
 		}
 	}
 	
 	public static String read(){
 		String s = "";
+		if(Main.connected == true){
+			try {
+				byte[] e = serialPort.readBytes();
+				s = new String(e, "UTF-8");
+			} catch (Exception e) {
+				e.printStackTrace();
+			}
+		}
+		return s;
+	}
+	
+	public static String connect(){
+		String s = "";
 		try {
 			byte[] e = serialPort.readBytes();
-			s = new String(e, "US-ASCII");
+			s = new String(e, "UTF-8");
 		} catch (Exception e) {
 			e.printStackTrace();
 		}
