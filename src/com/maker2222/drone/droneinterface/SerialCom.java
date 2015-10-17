@@ -8,34 +8,57 @@ import jssc.SerialPortEventListener;
 import jssc.SerialPortException;
 
 public class SerialCom implements SerialPortEventListener{
-	public static SerialPort serialPort;
-	public static boolean connected = false;
+	public SerialPort serialPort;
+	public boolean connected = false;
+	private String port;
+	private int baudrate;
+	private long delay;
 	
-	public static boolean openComm() throws SerialPortException{
-		try{
-			serialPort = new SerialPort("COM9");
-		    serialPort.openPort();
-			serialPort.addEventListener(new SerialCom());
-		    serialPort.setParams(115200, 8, 1, 0);
-		    Thread.sleep(1200);
-			return true;
-		}
-		catch(Exception e){
-			System.out.println("[ARDUINO_INTERFACE] Check if Arduino is connected.");
-			//e.printStackTrace();
-			return false;
-		}
+	/** SerialComm object, represents a connection with Arduino. When conected
+	 * Arduino is rebooted.
+	 * 
+	 * @param port : Port where Arduino is conencted.
+	 * 
+	 * @param baudrate : Baudrate to connect.
+	 * 
+	 * @param delay : Time that costs Arduino to reboot.
+	 */
+	
+	public SerialCom(String port, int baudrate, long delay) throws SerialPortException{
+		this.port = port;
+		this.baudrate = baudrate;
+		this.delay = delay;
 	}
 	
 	public void serialEvent(SerialPortEvent e) {
-		if(e.isRXCHAR() == true && connect().equals("hola")){
+		if(e.isRXCHAR() == true && conn().equals("hola")){
 			send("ok");
 		    System.out.println("[ARDUINO_INTERFACE] Successfully connected to Arduino");
 		    System.out.println("");
 		}
 	}
 	
-	public static String read(){
+	
+	/**Try to connect
+	 * 
+	 */
+	public void connect(){
+		try{
+			serialPort = new SerialPort(port);
+		    serialPort.openPort();
+			serialPort.addEventListener(this);
+		    serialPort.setParams(baudrate, 8, 1, 0);
+		    Thread.sleep(delay);
+		}
+		catch(Exception e){
+			System.out.println("[ARDUINO_INTERFACE] Check if Arduino is connected.");
+			//e.printStackTrace();
+		}
+	}
+	/**Read incoming data from serial port.
+	 * 
+	 */
+	public String read(){
 		String s = "";
 		if(Main.connected == true){
 			try {
@@ -48,7 +71,7 @@ public class SerialCom implements SerialPortEventListener{
 		return s;
 	}
 	
-	public static String connect(){
+	private String conn(){
 		String s = "";
 		try {
 			byte[] e = serialPort.readBytes();
@@ -58,16 +81,24 @@ public class SerialCom implements SerialPortEventListener{
 		}
 		return s;
 	}
-	
-	public static void send(String s){
+	/**Send a string through serial port
+	 * 
+	 * @param s : String to send.
+	 */
+	public void send(String s){
 		try {
 			serialPort.writeString(s);
 		} catch (SerialPortException e) {
 			e.printStackTrace();
 		}
 	}
-	
-	public static String recieve(String s){
+	/**Send a string through serial port
+	 * and read the reply.
+	 * 
+	 * @param s String to send.
+	 * @return String Message received.
+	 */
+	public String recieve(String s){
 		send(s);
 		return read();
 	}

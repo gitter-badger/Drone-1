@@ -17,40 +17,52 @@ import org.json.JSONObject;
 
 import com.maker2222.drone.main.ReadKey;
 
+/**Must explain what this does
+ * 
+ * @author Alex
+ *
+ */
 public class JsonRequest extends Thread{
-	 public static File json = new File("data.json");
-	 public static Date fecha = new Date ();
+	public static File json = new File("data.json");
+	public static Date fecha = new Date ();
 	public static Weather w;
+	private String city;
+	private String key;
 	 
 	@Override
 	public void run() {
 		try {
-			getJSON("Zaragoza");
 			parse();
 		} catch (IOException e) {
 			e.printStackTrace();
 		}
 	}
 	
+	public JsonRequest(String city){
+		this.city = city;
+		this.key = ReadKey.key();
+	}
 	
-	@Deprecated //This will change to get the forecast from coordinates
-	private static void getJSON(String city) throws IOException{
+	private FileOutputStream out;
+	public FileOutputStream makeReq() throws Exception{
 		try{
-		String url = "http://api.openweathermap.org/data/2.5/weather?q=" + city + "&lang=sp&units=metric&APPID=" + ReadKey.key();
-		URL website = new URL(url); //Http request
-		ReadableByteChannel in = Channels.newChannel(website.openStream());
-		FileOutputStream out = new FileOutputStream("data.json");
-		out.getChannel().transferFrom(in, 0, Long.MAX_VALUE);	//Write http response to "data.json" file
-		out.close();
-		}
-		catch(IOException e){
-			System.out.println("[NETWORK] ERROR DE CONEXION");
-			PrintStream stream = new PrintStream("error.log");
-			e.printStackTrace(stream);
-		}
+			String url = "http://api.openweathermap.org/data/2.5/weather?q=" + city + "&lang=sp&units=metric&APPID=" + key;
+			URL website = new URL(url); //Http request
+			ReadableByteChannel in = Channels.newChannel(website.openStream());
+			out = new FileOutputStream("data.json");
+			out.getChannel().transferFrom(in, 0, Long.MAX_VALUE);	//Write http response to "data.json" file
+			out.close();
+
+			}
+			catch(IOException e){
+				System.out.println("[NETWORK] ERROR DE CONEXION");
+				PrintStream stream = new PrintStream("error.log");
+				e.printStackTrace(stream);
+			}
+		return out;
 	}
 
-	public static void parse() throws IOException{
+	public void parse() throws IOException{
 		InputStream is = new FileInputStream(json);
 		String jsonTxt = IOUtils.toString(is);
 		//System.out.println(jsonTxt);

@@ -11,8 +11,11 @@ public class Main {
  public static boolean connected = false;
 	
 	public static void main(String[] args) throws Exception{
-		SerialCom.openComm();
-		new JsonRequest().start();
+		SerialCom communication = new SerialCom("COM9", 115200, 1200);
+		communication.connect();
+		JsonRequest json = new JsonRequest("Madrid");
+		json.makeReq();
+		json.run();
 		apiKey = ReadKey.key();
 		System.out.println(Tracing.trace(1, 1));
 	}
