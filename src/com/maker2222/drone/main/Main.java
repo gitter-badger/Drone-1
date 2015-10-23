@@ -9,14 +9,21 @@ public class Main {
  public static String apiKey;
  public static double angle;
  public static boolean connected = false;
+ public static SerialCom communication = new SerialCom("COM9", 115200, 1200);
 	
 	public static void main(String[] args) throws Exception{
-		SerialCom communication = new SerialCom("COM9", 115200, 1200);
-		communication.connect();
 		JsonRequest json = new JsonRequest("Madrid");
 		json.makeReq();
-		json.run();
+		json.parse();
 		apiKey = ReadKey.key();
 		System.out.println(Tracing.trace(1, 1));
+		communication.create();
+		communication.connect();
+		Thread.sleep(1000);
+		while(true){
+			String s = communication.recieve("getLoc");
+			System.out.println(s);
+		}
+		//while(true) Cmd.commands();
 	}
 }

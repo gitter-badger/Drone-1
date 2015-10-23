@@ -7,9 +7,10 @@ import jssc.SerialPortEvent;
 import jssc.SerialPortEventListener;
 import jssc.SerialPortException;
 
-public class SerialCom implements SerialPortEventListener{
+public class SerialCom implements SerialPortEventListener, Connection{
 	public SerialPort serialPort;
-	public boolean connected = false;
+	public boolean connected = true;
+	public byte[] buffer = new byte[1024];
 	private String port;
 	private int baudrate;
 	private long delay;
@@ -24,54 +25,63 @@ public class SerialCom implements SerialPortEventListener{
 	 * @param delay : Time that costs Arduino to reboot.
 	 */
 	
-	public SerialCom(String port, int baudrate, long delay) throws SerialPortException{
+	public SerialCom(String port, int baudrate, long delay){
 		this.port = port;
 		this.baudrate = baudrate;
 		this.delay = delay;
 	}
 	
 	public void serialEvent(SerialPortEvent e) {
-		if(e.isRXCHAR() == true && conn().equals("hola")){
+		/*
+		if(e.isRXCHAR() == true && firstConnection().equals("hola") && connected == false){
 			send("ok");
 		    System.out.println("[ARDUINO_INTERFACE] Successfully connected to Arduino");
 		    System.out.println("");
 		}
+		
+		if(e.isRXCHAR() == true){
+			String s = read();
+		    System.out.println(s);
+		}
+		*/
 	}
-	
+	public void create(){
+		serialPort = new SerialPort(port);
+	}
 	
 	/**Try to connect
 	 * 
 	 */
 	public void connect(){
-		try{
-			serialPort = new SerialPort(port);
-		    serialPort.openPort();
-			serialPort.addEventListener(this);
-		    serialPort.setParams(baudrate, 8, 1, 0);
-		    Thread.sleep(delay);
-		}
-		catch(Exception e){
-			System.out.println("[ARDUINO_INTERFACE] Check if Arduino is connected.");
-			//e.printStackTrace();
-		}
+			try{
+			    serialPort.openPort();
+				serialPort.addEventListener(this);
+			    serialPort.setParams(baudrate, 8, 1, 0);
+			    Thread.sleep(delay);
+			}
+			catch(Exception e){
+				System.out.println("[ARDUINO_INTERFACE] Check if Arduino is connected.");
+				//e.printStackTrace();
+			}
+			return;
 	}
-	/**Read incoming data from serial port.
-	 * 
-	 */
+
 	public String read(){
 		String s = "";
 		if(Main.connected == true){
 			try {
-				byte[] e = serialPort.readBytes();
-				s = new String(e, "UTF-8");
-			} catch (Exception e) {
-				e.printStackTrace();
+				byte[] buffer = serialPort.readBytes();
+				s = new String(buffer);
+				s = serialPort.readString();
+			} catch (Exception ex) {
+				ex.printStackTrace();
 			}
 		}
 		return s;
 	}
 	
-	private String conn(){
+	
+	public String firstConnection(){
 		String s = "";
 		try {
 			byte[] e = serialPort.readBytes();
@@ -81,26 +91,26 @@ public class SerialCom implements SerialPortEventListener{
 		}
 		return s;
 	}
-	/**Send a string through serial port
-	 * 
-	 * @param s : String to send.
-	 */
+	
 	public void send(String s){
 		try {
-			serialPort.writeString(s);
+			serialPort.writeBytes(s.getBytes());
 		} catch (SerialPortException e) {
 			e.printStackTrace();
 		}
 	}
-	/**Send a string through serial port
-	 * and read the reply.
-	 * 
-	 * @param s String to send.
-	 * @return String Message received.
-	 */
+	
 	public String recieve(String s){
 		send(s);
 		return read();
+	}
+	public void disconnect(){
+		try {
+			serialPort.closePort();
+		} catch (SerialPortException e) {
+			e.printStackTrace();
+		}
+		System.out.println("[ARDUINO_INTERFACE] Port closed");
 	}
 }
 

@@ -25,25 +25,25 @@ import com.maker2222.drone.main.ReadKey;
 public class JsonRequest extends Thread{
 	public static File json = new File("data.json");
 	public static Date fecha = new Date ();
-	public static Weather w;
+	public static WeatherObject w;
 	private String city;
 	private String key;
-	 
-	@Override
-	public void run() {
-		try {
-			parse();
-		} catch (IOException e) {
-			e.printStackTrace();
-		}
-	}
 	
+	/**This represents an incoming request to the API.
+	 * 
+	 * @param city : City where to get the forecast.
+	 */
 	public JsonRequest(String city){
 		this.city = city;
 		this.key = ReadKey.key();
 	}
 	
 	private FileOutputStream out;
+	/**Makes the request to the API
+	 * 
+	 * @return FileOutputStream
+	 * @throws Exception
+	 */
 	public FileOutputStream makeReq() throws Exception{
 		try{
 			String url = "http://api.openweathermap.org/data/2.5/weather?q=" + city + "&lang=sp&units=metric&APPID=" + key;
@@ -62,7 +62,13 @@ public class JsonRequest extends Thread{
 		return out;
 	}
 
-	public void parse() throws IOException{
+	/**Create a {@link WeatherObject} object with the data
+	 * from the received Json.
+	 * @return 
+	 * @return Weather object created.
+	 * @throws IOException
+	 */
+	public WeatherObject parse() throws IOException{
 		InputStream is = new FileInputStream(json);
 		String jsonTxt = IOUtils.toString(is);
 		//System.out.println(jsonTxt);
@@ -79,7 +85,8 @@ public class JsonRequest extends Thread{
 		    System.out.println("		" + main);
 		    System.out.println("		" + obj2.getInt("temp") + " C"); //Print temperature
 		}
-		w = new Weather(arr.getJSONObject(0).getString("main"), obj2.getInt("temp"), obj.getInt("dt"));
+		w = new WeatherObject(arr.getJSONObject(0).getString("main"), obj2.getInt("temp"), obj.getInt("dt"));
 		System.out.println(w.getFc());
+		return w;
 	}
 }
