@@ -1,19 +1,21 @@
 package com.maker2222.drone.droneinterface;
 
-import com.maker2222.drone.main.Main;
+import java.io.InputStream;
+import java.io.OutputStream;
 
-import jssc.SerialPort;
-import jssc.SerialPortEvent;
-import jssc.SerialPortEventListener;
-import jssc.SerialPortException;
+import com.fazecast.jSerialComm.SerialPort;
+import com.fazecast.jSerialComm.SerialPortDataListener;
+import com.fazecast.jSerialComm.SerialPortEvent;
 
-public class SerialCom implements SerialPortEventListener, Connection{
-	public SerialPort serialPort;
-	public boolean connected = true;
-	public byte[] buffer = new byte[1024];
+public class SerialCom implements SerialPortDataListener, Connection{
+	
+	private int dataLength;
+	private int parity;
+	private int stopBits;
 	private String port;
 	private int baudrate;
-	private long delay;
+	private byte[] buffer;
+	private SerialPort serialPort;
 	
 	/** SerialComm object, represents a connection with Arduino. When conected
 	 * Arduino is rebooted.
@@ -23,94 +25,72 @@ public class SerialCom implements SerialPortEventListener, Connection{
 	 * @param baudrate : Baudrate to connect.
 	 * 
 	 * @param delay : Time that costs Arduino to reboot.
+	 * @param dataLength 
 	 */
 	
-	public SerialCom(String port, int baudrate, long delay){
+	public SerialCom(String port, int baudrate, int dataLength, int stopBits, int parity, int bufferSize){
 		this.port = port;
 		this.baudrate = baudrate;
-		this.delay = delay;
+		this.parity = parity;
+		this.stopBits = stopBits;
+		this.dataLength = dataLength;
+		this.buffer = new byte[bufferSize];
 	}
 	
-	public void serialEvent(SerialPortEvent e) {
-		/*
-		if(e.isRXCHAR() == true && firstConnection().equals("hola") && connected == false){
-			send("ok");
-		    System.out.println("[ARDUINO_INTERFACE] Successfully connected to Arduino");
-		    System.out.println("");
-		}
-		
-		if(e.isRXCHAR() == true){
-			String s = read();
-		    System.out.println(s);
-		}
-		*/
-	}
-	public void create(){
-		serialPort = new SerialPort(port);
-	}
-	
-	/**Try to connect
-	 * 
-	 */
-	public void connect(){
-			try{
-			    serialPort.openPort();
-				serialPort.addEventListener(this);
-			    serialPort.setParams(baudrate, 8, 1, 0);
-			    Thread.sleep(delay);
-			}
-			catch(Exception e){
-				System.out.println("[ARDUINO_INTERFACE] Check if Arduino is connected.");
-				//e.printStackTrace();
-			}
-			return;
+	public void connect() throws InterruptedException{
+			serialPort = SerialPort.getCommPort(this.port);
+			serialPort.setComPortParameters(baudrate, dataLength, stopBits, parity);
+			//serialPort.setComPortTimeouts(SerialPort.T, 0, 0);
+			serialPort.openPort();
+			serialPort.addDataListener(this);
 	}
 
-	public String read(){
-		String s = "";
-		if(Main.connected == true){
-			try {
-				byte[] buffer = serialPort.readBytes();
-				s = new String(buffer);
-				s = serialPort.readString();
-			} catch (Exception ex) {
-				ex.printStackTrace();
-			}
-		}
-		return s;
+	public byte[] read(int bytecount){
+		serialPort.readBytes(buffer, bytecount);
+		return buffer;
 	}
 	
 	
-	public String firstConnection(){
-		String s = "";
-		try {
-			byte[] e = serialPort.readBytes();
-			s = new String(e, "UTF-8");
-		} catch (Exception e) {
-			e.printStackTrace();
-		}
-		return s;
+	public byte[] firstConnection(){
+		serialPort.readBytes(buffer, 4);
+		return buffer;
 	}
 	
-	public void send(String s){
-		try {
-			serialPort.writeBytes(s.getBytes());
-		} catch (SerialPortException e) {
-			e.printStackTrace();
-		}
+	public void send(byte[] s){
+		serialPort.writeBytes(s, s.length);
 	}
 	
-	public String recieve(String s){
+	public byte[] recieve(byte[] s, int bytecount){
 		send(s);
-		return read();
+		return read(bytecount);
 	}
 	public void disconnect(){
-		try {
-			serialPort.closePort();
-		} catch (SerialPortException e) {
-			e.printStackTrace();
-		}
+		serialPort.closePort();
 		System.out.println("[ARDUINO_INTERFACE] Port closed");
+	}
+	
+	public InputStream getInputStream(){
+		return serialPort.getInputStream();
+	}
+	
+	public OutputStream getOutputStream(){
+		return serialPort.getOutputStream();
+	}
+
+	public int getListeningEvents() {
+		return SerialPort.LISTENING_EVENT_DATA_AVAILABLE;
+	}
+
+	public void serialEvent(SerialPortEvent e) {
+		if (e.getEventType() != SerialPort.LISTENING_EVENT_DATA_AVAILABLE)
+	         return;
+		byte[] newData = new byte[serialPort.bytesAvailable()];
+		serialPort.readBytes(newData, newData.length);
+		String d  = "";
+		d = new String(newData);
+		if(d.startsWith("@") && d.endsWith("\n") && d.getBytes().length <= 12){
+			System.out.println("Data: " + d);
+		}
 	}
 }
 

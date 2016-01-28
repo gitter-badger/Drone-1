@@ -34,11 +34,22 @@ public class JsonRequest extends Thread{
 	 * @param city : City where to get the forecast.
 	 */
 	public JsonRequest(String city){
-		this.city = city;
+		this.city = city.replaceAll(" ", "%20");
 		this.key = ReadKey.key();
 	}
 	
 	private FileOutputStream out;
+	
+	public void request(){
+		try {
+			this.makeReq();
+			this.parse();
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
+
+	}
+	
 	/**Makes the request to the API
 	 * 
 	 * @return FileOutputStream
@@ -64,8 +75,8 @@ public class JsonRequest extends Thread{
 
 	/**Create a {@link WeatherObject} object with the data
 	 * from the received Json.
-	 * @return 
-	 * @return Weather object created.
+	 * 
+	 * @return Weather object with all the data from the request.
 	 * @throws IOException
 	 */
 	public WeatherObject parse() throws IOException{
@@ -86,7 +97,6 @@ public class JsonRequest extends Thread{
 		    System.out.println("		" + obj2.getInt("temp") + " C"); //Print temperature
 		}
 		w = new WeatherObject(arr.getJSONObject(0).getString("main"), obj2.getInt("temp"), obj.getInt("dt"));
-		System.out.println(w.getFc());
 		return w;
 	}
 }

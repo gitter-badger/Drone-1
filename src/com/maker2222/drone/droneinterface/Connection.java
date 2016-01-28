@@ -1,38 +1,35 @@
 package com.maker2222.drone.droneinterface;
 
-import jssc.SerialPortEvent;
-
 public interface Connection {
-	void serialEvent(SerialPortEvent e);
-	
-	void connect();
+
+	void connect() throws InterruptedException;
 	
 	/**
 	 * Send a connection request
 	 * 
 	 * @return Response
 	 */
-	String firstConnection();
+	byte[] firstConnection();
 	
 	/**Read incoming data from serial port.
 	 * 
-	 * @return Incoming data as string;
+	 * @return Incoming data.
 	 */
-	String read();
+	byte[] read(int bytecount);
 	
-	/**Send a string through serial port
+	/**Send bytes through serial port
 	 * 
-	 * @param s : String to send.
+	 * @param b : Bytes to send.
 	 */
-	void send(String s);
+	void send(byte[] b);
 	
-	/**Send a string through serial port
+	/**Send data through serial port
 	 * and read the reply.
 	 * 
-	 * @param s String to send.
-	 * @return String Message received.
+	 * @param b Bytes to send.
+	 * @return Bytes received.
 	 */
-	String recieve(String s);
+	byte[] recieve(byte[] b, int bytecount);
 	
 	void disconnect();
 }
